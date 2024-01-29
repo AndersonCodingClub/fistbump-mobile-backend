@@ -1,4 +1,3 @@
-import os
 import json
 import socket
 from typing import Dict
@@ -19,3 +18,15 @@ def test_client_ping():
     response = send_request(payload=payload)
     
     assert response['msg'] == 'PONG'
+    
+def test_valid_client_login():
+    payload = {'operation':'LOGIN', 'username':'testuser', 'password':'testuserpassword'}
+    response = send_request(payload=payload)
+    
+    assert response['msg'] == 'SUCCESS'
+    
+def test_invalid_client_login():
+    payload = {'operation':'LOGIN', 'username':'invalidtestuser', 'password':'invalidtestuser'}
+    response = send_request(payload=payload)
+
+    assert response['msg'] == 'FAILED'

@@ -1,9 +1,9 @@
 import os
-import sys
 import json
 import socket
 import threading
 from typing import Tuple
+from database import Database
 from dotenv import load_dotenv
 
 
@@ -16,12 +16,20 @@ def handle_client_connection(client_socket: socket.socket, address: Tuple):
         if recieved_data:
             data = json.loads(recieved_data)
             if data['operation'] == 'PING':
-                response = {'msg':'PONG'}
+                response = {'code':200, 'msg':'PONG'}
+            elif data['operation'] == 'LOGIN':
+                username, password = data['username'], data['password']
+                
+                d = Database()
+                if d.validate_user(username=username, password=password):                    
+                    response = {'code':200, 'msg':'SUCCESS'}
+                else:
+                    response = {'code':200, 'msg':'FAILED'}
             
             client_socket.sendall(bytes(json.dumps(response), encoding='utf-8'))
     except Exception as e:
         print(e)
-        response = {'msg':'ERROR'}
+        response = {'code':500, 'msg':'ERROR'}
         client_socket.sendall(bytes(json.dumps(response), encoding='utf-8'))
     finally:
         client_socket.close()
