@@ -1,5 +1,4 @@
 import os
-import json
 from flask import Flask, request, jsonify
 from database import Database
 from dotenv import load_dotenv
@@ -18,8 +17,9 @@ def login():
         data = request.json
         username, password = data['username'], data['password']
         d = Database()
-        if d.validate_user(username=username, password=password):
-            return jsonify({'msg': 'SUCCESS'})
+        user_id = d.validate_user(username=username, password=password)
+        if user_id:
+            return jsonify({'msg': 'SUCCESS', 'userID': user_id})
         else:
             return jsonify({'msg': 'FAILED'})
     except Exception as e:
