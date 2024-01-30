@@ -1,32 +1,31 @@
-import json
-import socket
+import requests
 from typing import Dict
 
 
 TEST_HOST='127.0.0.1'
 TEST_PORT=3000
+TEST_URL = f'http://{TEST_HOST}:{TEST_PORT}'
 
-def send_request(payload: Dict) -> Dict:
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((TEST_HOST, TEST_PORT))
-        s.sendall(bytes(json.dumps(payload), encoding="utf-8"))
-        response = s.recv(1024).decode('utf-8').strip()
-    return json.loads(response)
+def _make_post_request(payload: Dict, endpoint: str) -> requests.Response:
+    headers = {'Content-Type': 'application/json'}
+    return requests.post(f'{TEST_URL}/{endpoint}', json=payload, headers=headers)
 
 def test_client_ping():
-    payload = {'operation':'PING'}
-    response = send_request(payload=payload)
+    resp = requests.get(f'{TEST_URL}/ping')
     
-    assert response['msg'] == 'PONG'
+    assert resp.status_code == 200
+    assert resp.json()['msg'] == 'PONG'
     
 def test_valid_client_login():
-    payload = {'operation':'LOGIN', 'username':'testuser', 'password':'testuserpassword'}
-    response = send_request(payload=payload)
+    payload = {'username':'testuser', 'password':'testuserpassword'}
+    resp = _make_post_request(payload, 'login') 
     
-    assert response['msg'] == 'SUCCESS'
+    assert resp.status_code == 200
+    assert resp.json()['msg'] == 'SUCCESS'
     
 def test_invalid_client_login():
-    payload = {'operation':'LOGIN', 'username':'invalidtestuser', 'password':'invalidtestuser'}
-    response = send_request(payload=payload)
-
-    assert response['msg'] == 'FAILED'
+    payload = {'username':'invalidtestuser', 'password':'invalidtestpassword'}
+    resp = _make_post_request(payload, 'login') 
+       
+    assert resp.status_code == 200
+    assert resp.json()['msg'] == 'FAILED'
