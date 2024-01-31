@@ -55,6 +55,15 @@ class Database:
             if password_hash == row[4]:
                 return row[0]
             
+    def check_if_avaliable(self, email: str, username: str) -> bool:
+        self._setup_connection()
+        
+        self.cursor.execute('SELECT * FROM users WHERE username=%s OR email=%s', (username, email))
+        row = self.cursor.fetchone()
+        
+        self._close_connection()
+        return not bool(row)
+            
     def get_user_row(self, user_id: int) -> Tuple:
         self._setup_connection()
         

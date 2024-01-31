@@ -2,7 +2,7 @@ import requests
 from typing import Dict
 
 
-TEST_HOST='127.0.0.1'
+TEST_HOST='0.0.0.0'
 TEST_PORT=3000
 TEST_URL = f'http://{TEST_HOST}:{TEST_PORT}'
 

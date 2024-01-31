@@ -26,5 +26,20 @@ def login():
         print(e)
         return jsonify({'msg': 'ERROR'}), 500
     
+@app.route('/signup', methods=['POST'])
+def signup():
+    try:
+        data = request.json
+        d = Database()
+        email, username = data['email'], data['username']
+        if d.check_if_avaliable(email, username):
+            user_id = d.add_user(email, data['name'], username, data['password'], data['major'], int(data['year']))
+            return jsonify({'msg': 'SUCCESS', 'userID': user_id})
+        else:
+            return jsonify({'msg': 'FAILED'})
+    except Exception as e:
+        print(e)
+        return jsonify({'msg': 'ERROR'}), 500
+        
 if __name__ == '__main__':
     app.run(host=os.environ['HOST'], port=int(os.environ['PORT']))
