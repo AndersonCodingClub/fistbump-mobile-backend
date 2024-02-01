@@ -91,3 +91,9 @@ class Database:
         
         self._close_connection()
         return rows
+    
+    def remove_user(self, user_id: int):
+        self._setup_connection()
+        self.cursor.execute('DELETE FROM users WHERE user_id=%s', (user_id,))
+        self.conn.commit()
+        self._close_connection()
