@@ -16,7 +16,6 @@ class Database:
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS users (
                 user_id INT AUTO_INCREMENT PRIMARY KEY,
-                email VARCHAR(255) NOT NULL,
                 name VARCHAR(255) NOT NULL,
                 username VARCHAR(255) NOT NULL,
                 password VARCHAR(255) NOT NULL,
@@ -32,12 +31,12 @@ class Database:
         self.cursor.close()
         self.conn.close()
     
-    def add_user(self, email: str, name: str, username: str, password: str, major: str, year: int) -> int:
+    def add_user(self, name: str, username: str, password: str, major: str, year: int) -> int:
         self._setup_connection()
         
-        insert_query = 'INSERT INTO users (email, name, username, password, major, year) VALUES (%s, %s, %s, %s, %s, %s)'
+        insert_query = 'INSERT INTO users (name, username, password, major, year) VALUES (%s, %s, %s, %s, %s)'
         password_hash = hashlib.sha256(password.encode()).hexdigest()
-        row = (email, name, username, password_hash, major, year)
+        row = (name, username, password_hash, major, year)
         self.cursor.execute(insert_query, row)
         self.conn.commit()
         user_id = self.cursor.lastrowid
@@ -47,18 +46,18 @@ class Database:
     
     def validate_user(self, username: str, password: str) -> int:
         self._setup_connection()
-        self.cursor.execute('SELECT * FROM users WHERE username=%s OR email=%s', (username, username))
+        self.cursor.execute('SELECT * FROM users WHERE username=%s', (username,))
         row = self.cursor.fetchone()
         self._close_connection()
         if row:
             password_hash = hashlib.sha256(password.encode()).hexdigest()
-            if password_hash == row[4]:
+            if password_hash == row[3]:
                 return row[0]
             
-    def check_if_avaliable(self, email: str, username: str) -> bool:
+    def check_if_avaliable(self, username: str) -> bool:
         self._setup_connection()
         
-        self.cursor.execute('SELECT * FROM users WHERE username=%s OR email=%s', (username, email))
+        self.cursor.execute('SELECT * FROM users WHERE username=%s', (username,))
         row = self.cursor.fetchone()
         
         self._close_connection()

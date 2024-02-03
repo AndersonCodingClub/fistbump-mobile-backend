@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(
 from database import Database
 
 
-TEST_HOST='192.168.4.28'
+TEST_HOST='10.9.150.219'
 TEST_PORT=3000
 TEST_URL = f'http://{TEST_HOST}:{TEST_PORT}'
 
@@ -51,7 +51,7 @@ def test_validate_invalid_client_signup_credentials():
     assert resp.json()['msg'] == 'FAILED'
 
 def test_valid_client_signup():
-    payload = {'username':'testsignup', 'password':'testsignuppassword', 'name':'Test Signup', 'email':'signup@email.com', 'major':'major', 'year':2025}
+    payload = {'username':'testsignup', 'password':'testsignuppassword', 'name':'Test Signup', 'major':'major', 'year':2025}
     resp = _make_post_request(payload, 'signup')
     
     assert resp.status_code == 200
@@ -62,9 +62,9 @@ def test_valid_client_signup():
     
 def test_invalid_client_signup():
     db = Database()
-    user_id = db.add_user('signup@email.com', 'Test Signup', 'testsignup', 'testsignuppassword', 'major', 2025)
+    user_id = db.add_user('Test Signup', 'testsignup', 'testsignuppassword', 'major', 2025)
     
-    payload = {'username':'testsignup', 'password':'testsignuppassword', 'name':'Test Signup', 'email':'signup@email.com', 'major':'major', 'year':2025}
+    payload = {'username':'testsignup', 'password':'testsignuppassword', 'name':'Test Signup', 'major':'major', 'year':2025}
     resp = _make_post_request(payload, 'signup')
     
     assert resp.status_code == 200
