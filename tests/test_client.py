@@ -51,7 +51,7 @@ def test_validate_invalid_client_signup_credentials():
     assert resp.json()['msg'] == 'FAILED'
 
 def test_valid_client_signup():
-    payload = {'username':'testsignup', 'password':'testsignuppassword', 'name':'Test Signup', 'major':'major', 'year':2025}
+    payload = {'username':'testsignup', 'password':'testsignuppassword', 'name':'Test Signup', 'major':'major', 'age':21}
     resp = _make_post_request(payload, 'signup')
     
     assert resp.status_code == 200
@@ -62,9 +62,9 @@ def test_valid_client_signup():
     
 def test_invalid_client_signup():
     db = Database()
-    user_id = db.add_user('Test Signup', 'testsignup', 'testsignuppassword', 'major', 2025)
+    user_id = db.add_user('Test Signup', 'testsignup', 'testsignuppassword', 'major', 21)
     
-    payload = {'username':'testsignup', 'password':'testsignuppassword', 'name':'Test Signup', 'major':'major', 'year':2025}
+    payload = {'username':'testsignup', 'password':'testsignuppassword', 'name':'Test Signup', 'major':'major', 'age':21}
     resp = _make_post_request(payload, 'signup')
     
     assert resp.status_code == 200

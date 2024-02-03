@@ -48,7 +48,7 @@ def signup():
         d = Database()
         username = data['username']
         if d.check_if_avaliable(username):
-            user_id = d.add_user(data['name'], username, data['password'], data['major'], int(data['year']))
+            user_id = d.add_user(data['name'], username, data['password'], data['major'], int(data['age']))
             return jsonify({'msg': 'SUCCESS', 'userID': user_id})
         else:
             return jsonify({'msg': 'FAILED'})
