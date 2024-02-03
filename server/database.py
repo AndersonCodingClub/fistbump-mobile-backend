@@ -28,7 +28,7 @@ class Database:
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS images (
                 image_id INT AUTO_INCREMENT PRIMARY KEY,
-                user_id INT NOT NULL
+                user_id INT NOT NULL,
                 path VARCHAR(255) NOT NULL,
                 date_published DATETIME NOT NULL
             )
