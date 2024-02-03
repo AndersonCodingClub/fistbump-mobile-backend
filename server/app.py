@@ -64,9 +64,8 @@ def save_image():
     try:
         data = request.json
         
-        user_id, image_data_url = data['user_id'], data['dataURL']
-        image_data = image_data_url.split(',')[1]
-        decoded_data = base64.b64decode(image_data.encode('utf-8'))
+        user_id, image_data_url = data['userID'], data['imageData']
+        decoded_data = base64.b64decode(image_data_url.encode('utf-8'))
         
         path = save_image_file(decoded_data)
         image_id = Database().add_image(user_id, path)
