@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(
 from database import Database
 
 
-TEST_HOST='10.9.150.219'
+TEST_HOST='192.168.4.28'
 TEST_PORT=3000
 TEST_URL = f'http://{TEST_HOST}:{TEST_PORT}'
 
@@ -33,6 +33,20 @@ def test_invalid_client_login():
     payload = {'username':'invalidtestuser', 'password':'invalidtestpassword'}
     resp = _make_post_request(payload, 'login') 
        
+    assert resp.status_code == 200
+    assert resp.json()['msg'] == 'FAILED'
+    
+def test_validate_valid_client_signup_credentials():
+    payload = {'username':'avaliabletestuser'}
+    resp = _make_post_request(payload, 'validate-signup-credentials')
+    
+    assert resp.status_code == 200
+    assert resp.json()['msg'] == 'SUCCESS'
+    
+def test_validate_invalid_client_signup_credentials():
+    payload = {'username':'testuser'}
+    resp = _make_post_request(payload, 'validate-signup-credentials')
+    
     assert resp.status_code == 200
     assert resp.json()['msg'] == 'FAILED'
 

@@ -25,7 +25,22 @@ def login():
     except Exception as e:
         print(e)
         return jsonify({'msg': 'ERROR'}), 500
-    
+
+@app.route('/validate-signup-credentials', methods=['POST'])
+def validate_signup_credentials():
+    try:
+        data = request.json
+        d = Database()
+        username = data['username']
+        is_avaliable = d.check_if_avaliable(username, username)
+        if is_avaliable:
+            return jsonify({'msg': 'SUCCESS'})
+        else:
+            return jsonify({'msg': 'FAILED'})
+    except Exception as e:
+        print(e)
+        return jsonify({'msg':'ERROR'}), 500
+
 @app.route('/signup', methods=['POST'])
 def signup():
     try:
