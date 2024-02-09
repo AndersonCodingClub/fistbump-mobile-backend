@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 
-MEDIA_PATH = os.path.abspath(os.path.join('..', 'media'))
+MEDIA_PATH = 'media'
 
 def get_file_names_by_time(directory: str):
     if not os.path.exists(MEDIA_PATH):

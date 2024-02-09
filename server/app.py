@@ -3,7 +3,7 @@ import base64
 from database import Database
 from dotenv import load_dotenv
 from save import save_image_file
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 
 
 load_dotenv('config.env')
@@ -89,6 +89,11 @@ def get_images():
     except Exception as e:
         print(e)
         return jsonify({'msg': 'ERROR'}), 500
+    
+@app.route('/serve/<path:img_path>')
+def serve_media(img_path):
+    directory, file_name = img_path.split('/')
+    return send_from_directory(directory, file_name)
         
 if __name__ == '__main__':
     app.run(host=os.environ['HOST'], port=int(os.environ['PORT']))
