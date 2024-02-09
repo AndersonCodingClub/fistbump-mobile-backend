@@ -83,6 +83,7 @@ def get_images():
         image_rows = Database().get_images()
         image_paths = [image_row[2] for image_row in image_rows]
         if image_paths:
+            image_paths.reverse()
             return jsonify({'msg': 'SUCCESS', 'image_paths': image_paths})
         else:
             return jsonify({'msg': 'FAILED'})
