@@ -59,16 +59,29 @@ def signup():
         print(e)
         return jsonify({'msg': 'ERROR'}), 500
     
+@app.route('/get-match')
+def get_match():
+    try:
+        d = Database()
+        
+        match_user_id = d.get_random_user()
+        match_user_row = d.get_user_row(match_user_id)
+        
+        return jsonify({'msg': 'SUCCESS', 'match_user_id': match_user_id, 'match_user_row': match_user_row})
+    except Exception as e:
+        print(e)
+        return jsonify({'msg': 'ERROR'}), 500
+    
 @app.route('/save-image', methods=['POST'])
 def save_image():
     try:
         data = request.json
         
-        user_id, image_data_url = data['userID'], data['imageData']
+        user_id, match_user_id, image_data_url = data['userID'], data['matchUserID'], data['imageData']
         decoded_data = base64.b64decode(image_data_url.encode('utf-8'))
         
         path = save_image_file(decoded_data)
-        image_id = Database().add_image(user_id, path)
+        image_id = Database().add_image(user_id, match_user_id, path)
         if image_id:
             return jsonify({'msg': 'SUCCESS'})
         else:
@@ -77,7 +90,7 @@ def save_image():
         print(e)
         return jsonify({'msg': 'ERROR'}), 500
     
-@app.route('/get-images', methods=['GET'])
+@app.route('/get-images')
 def get_images():
     try:
         image_rows = Database().get_images()
