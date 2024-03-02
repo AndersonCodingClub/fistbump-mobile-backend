@@ -33,10 +33,8 @@ def login():
 def validate_signup_credentials():
     try:
         data = request.json
-        d = Database()
         username = data['username']
-        is_avaliable = d.check_if_avaliable(username)
-        if is_avaliable:
+        if Database().check_if_avaliable(username):
             return jsonify({'msg': 'SUCCESS'})
         else:
             return jsonify({'msg': 'FAILED'})
