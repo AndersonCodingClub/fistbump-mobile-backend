@@ -5,6 +5,8 @@ import mysql.connector
 from typing import List, Tuple
 
 
+os.environ['password'] = '$uper$trong2007!'
+
 class Database:
     def _setup_connection(self):
         self.conn = mysql.connector.connect(host='localhost', user='root', password=os.environ['password'])
@@ -85,9 +87,9 @@ class Database:
     def get_random_user(self, user_id: int) -> int:
         self._setup_connection()
         
-        self.cursor.execute('SELECT user_id FROM users')
-        user_ids = [row[0] for row in self.cursor.fetchall() if row[0] != user_id]
-        
+        self.cursor.execute('SELECT user_id FROM users WHERE user_id!=%s', (user_id,))
+        user_ids = [row[0] for row in self.cursor.fetchall()]
+
         self._close_connection()
         return rd.choice(user_ids)
     

@@ -57,12 +57,13 @@ def signup():
         print(e)
         return jsonify({'msg': 'ERROR'}), 500
     
-@app.route('/get-match')
+@app.route('/get-match', methods=['POST'])
 def get_match():
     try:
-        d = Database()
+        d = Database()        
+        user_id = request.json['userID']
         
-        match_user_id = d.get_random_user()
+        match_user_id = d.get_random_user(user_id)
         match_user_row = d.get_user_row(match_user_id)
         
         return jsonify({'msg': 'SUCCESS', 'match_user_id': match_user_id, 'match_user_row': match_user_row})
@@ -77,7 +78,7 @@ def save_image():
         
         user_id, match_user_id, image_data_url = data['userID'], data['matchUserID'], data['imageData']
         decoded_data = base64.b64decode(image_data_url.encode('utf-8'))
-        
+
         path = save_image_file(decoded_data)
         image_id = Database().add_image(user_id, match_user_id, path)
         if image_id:
@@ -92,7 +93,7 @@ def save_image():
 def get_images():
     try:
         image_rows = Database().get_images()
-        image_paths = [image_row[2] for image_row in image_rows]
+        image_paths = [image_row[3] for image_row in image_rows]
         if image_paths:
             image_paths.reverse()
             return jsonify({'msg': 'SUCCESS', 'image_paths': image_paths})
