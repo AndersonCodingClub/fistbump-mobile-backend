@@ -126,6 +126,15 @@ class Database:
         self._close_connection()
         return image_id
     
+    def get_image_row(self, path: str) -> List[Tuple]:
+        self._setup_connection()
+        
+        self.cursor.execute('SELECT * FROM images WHERE path=%s', (path,))
+        row = self.cursor.fetchone()
+        
+        self._close_connection()
+        return row
+    
     def get_images(self, user_id: int=None) -> List[Tuple]:
         self._setup_connection()
         

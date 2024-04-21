@@ -119,6 +119,20 @@ def get_images():
 def serve_media(img_path):
     directory, file_name = img_path.split('/')
     return send_from_directory(directory, file_name)
+
+@app.route('/serve/<path:img_path>/metadata')
+def serve_media_metadata(img_path):
+    try:
+        d = Database()
+        image_row = d.get_image_row(img_path)
+        user1_id, user2_id, date_published = image_row[1], image_row[2], image_row[-1]
+        user1_username, user2_username = d.get_user_row(user1_id)[2], d.get_user_row(user2_id)[2]
+        
+        return jsonify({'msg': 'SUCCESS', 'user1_name': user1_username, 'user2_name': user2_username, 'date_published': str(date_published)})
+    except Exception as e:
+        print(e)
+        return jsonify({'msg': 'ERROR'}), 500
+
         
 if __name__ == '__main__':
     app.run(host=os.environ['HOST'], port=int(os.environ['PORT']), debug=False)
