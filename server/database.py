@@ -40,6 +40,16 @@ class Database:
         ''')
         
         self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS followers (
+                follower_id INT NOT NULL,
+                following_id INT NOT NULL,
+                PRIMARY KEY (follower_id, following_id),
+                FOREIGN KEY (follower_id) REFERENCES users(user_id),
+                FOREIGN KEY (following_id) REFERENCES users(user_id)
+            )
+        ''')
+        
+        self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS images (
                 image_id INT AUTO_INCREMENT PRIMARY KEY,
                 user_id INT NOT NULL,
@@ -199,3 +209,40 @@ class Database:
         self.conn.commit()
         
         self._close_connection()
+        
+    # Follow methods
+    def add_follower(self, follower_id: int, following_id: int):
+        self._setup_connection()
+        
+        insert_query = 'INSERT INTO followers (follower_id, following_id) VALUES (%s, %s)'
+        self.cursor.execute(insert_query, (follower_id, following_id))
+        self.conn.commit()
+        
+        self._close_connection()
+
+    def remove_follower(self, follower_id: int, following_id: int):
+        self._setup_connection()
+        
+        delete_query = 'DELETE FROM followers WHERE follower_id=%s AND following_id=%s'
+        self.cursor.execute(delete_query, (follower_id, following_id))
+        self.conn.commit()
+        
+        self._close_connection()
+        
+    def get_followers(self, user_id: int) -> List[int]:
+        self._setup_connection()
+        
+        self.cursor.execute('SELECT follower_id FROM followers WHERE following_id=%s', (user_id,))
+        followers = [row[0] for row in self.cursor.fetchall()]
+        
+        self._close_connection()
+        return followers
+        
+    def get_following(self, user_id: int) -> List[int]:
+        self._setup_connection()
+        
+        self.cursor.execute('SELECT following_id FROM followers WHERE follower_id=%s', (user_id,))
+        following = [row[0] for row in self.cursor.fetchall()]
+        
+        self._close_connection()
+        return following

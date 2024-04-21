@@ -11,10 +11,12 @@ load_dotenv('config.env')
 app = Flask(__name__)
 app.static_folder = 'media'
 
+# Server status services
 @app.route('/ping', methods=['GET'])
 def ping():
     return jsonify({'msg': 'PONG'})
 
+# User services
 @app.route('/login', methods=['POST'])
 def login():
     try:
@@ -58,6 +60,18 @@ def signup():
         print(e)
         return jsonify({'msg': 'ERROR'}), 500
     
+@app.route('/get-user-info/<user_id>')
+def get_user_info(user_id):
+    try:
+        d = Database()
+        user_row = d.get_user_row(user_id)
+        follower_count, following_count = len(d.get_followers(user_id)), len(d.get_following(user_id))
+        return jsonify({'msg': 'SUCCESS', 'name': user_row[1], 'username': user_row[2], 'followerCount': follower_count, 'followingCount': following_count})
+    except Exception as e:
+        print(e)
+        return jsonify({'msg': 'ERROR'}), 500
+
+# Matching services
 @app.route('/get-match', methods=['POST'])
 def get_match():
     try:
@@ -82,7 +96,8 @@ def get_match():
     except Exception as e:
         print(e)
         return jsonify({'msg': 'ERROR'}), 500
-    
+
+# Image services
 @app.route('/save-image', methods=['POST'])
 def save_image():
     try:
@@ -133,6 +148,62 @@ def serve_media_metadata(img_path):
         print(e)
         return jsonify({'msg': 'ERROR'}), 500
 
+# Follow services
+@app.route('/get-followers/<user_id>')
+def get_followers(user_id):
+    try:
+        d = Database()
+        follower_ids = d.get_followers(user_id)
+        follower_rows = [d.get_user_row(follower_id) for follower_id in follower_ids]
+        formatted_follower_rows = []
+        for follower_row in follower_rows:
+            follower_info_dict = {'user_id': follower_row[0], 'name':follower_row[1], 'username':follower_row[2]}
+            formatted_follower_rows.append(follower_info_dict)
+
+        return jsonify({'msg': 'SUCCESS', 'follower_info':formatted_follower_rows})
+    except Exception as e:
+        print(e)
+        return jsonify({'msg': 'ERROR'}), 500
+    
+@app.route('/get-following/<user_id>')
+def get_following(user_id):
+    try:
+        d = Database()
+        following_ids = d.get_following(user_id)
+        following_rows = [d.get_user_row(following_id) for following_id in following_ids]
+        formatted_following_rows = []
+        for following_row in following_rows:
+            following_info_dict = {'user_id': following_row[0], 'name':following_row[1], 'username':following_row[2]}
+            formatted_following_rows.append(following_info_dict)
+
+        return jsonify({'msg': 'SUCCESS', 'follower_info':formatted_following_rows})
+    except Exception as e:
+        print(e)
+        return jsonify({'msg': 'ERROR'}), 500
+    
+@app.route('/follow', methods=['POST'])
+def follow_user():
+    try:
+        data = request.json
+        follower_id, following_id = data['followerID'], data['followingID']
+        Database().add_follower(follower_id, following_id)
+        
+        return jsonify({'msg': 'SUCCESS'})
+    except Exception as e:
+        print(e)
+        return jsonify({'msg': 'ERROR'}), 500
+    
+@app.route('/unfollow', methods=['POST'])
+def unfollow_user():
+    try:
+        data = request.json
+        follower_id, following_id = data['followerID'], data['followingID']
+        Database().remove_follower(follower_id, following_id)
+        
+        return jsonify({'msg': 'SUCCESS'})
+    except Exception as e:
+        print(e)
+        return jsonify({'msg': 'ERROR'}), 500
         
 if __name__ == '__main__':
     app.run(host=os.environ['HOST'], port=int(os.environ['PORT']), debug=False)
