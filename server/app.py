@@ -1,5 +1,6 @@
 import os
 import base64
+from datetime import date
 from database import Database
 from dotenv import load_dotenv
 from save import save_image_file
@@ -61,10 +62,21 @@ def signup():
 def get_match():
     try:
         d = Database()        
-        user_id = request.json['userID']
+        user_id = int(request.json['userID'])
         
-        match_user_id = d.get_random_user(user_id)
-        match_user_row = d.get_user_row(match_user_id)
+        match_row = d.get_match_row(user_id)
+        match_day_difference = (date.today() - match_row[-1].date()).days
+
+        if match_row and match_day_difference == 0:
+            # Return existing match information
+            match_user_id = (match_row[1] if match_row[1] != user_id else match_row[2])
+            match_user_row = d.get_user_row(match_user_id)
+        else:
+            # Create new match
+            d.remove_match_row(user_id)
+            match_user_id = d.get_random_match_user(user_id)
+            match_user_row = d.get_user_row(match_user_id)
+            d.add_match(user1_id=user_id, user2_id=match_user_id)
         
         return jsonify({'msg': 'SUCCESS', 'match_user_id': match_user_id, 'match_user_row': match_user_row})
     except Exception as e:
@@ -109,4 +121,4 @@ def serve_media(img_path):
     return send_from_directory(directory, file_name)
         
 if __name__ == '__main__':
-    app.run(host=os.environ['HOST'], port=int(os.environ['PORT']))
+    app.run(host=os.environ['HOST'], port=int(os.environ['PORT']), debug=False)
