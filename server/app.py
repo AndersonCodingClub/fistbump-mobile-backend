@@ -207,4 +207,4 @@ def unfollow_user():
         return jsonify({'msg': 'ERROR'}), 500
         
 if __name__ == '__main__':
-    app.run(host=os.environ['HOST'], port=int(os.environ['PORT']), debug=False)
+    app.run(host=os.environ['HOST'], port=int(os.environ['PORT']), debug=True)

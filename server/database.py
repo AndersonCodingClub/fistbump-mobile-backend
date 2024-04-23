@@ -5,8 +5,6 @@ import mysql.connector
 from typing import List, Tuple
 
 
-os.environ['password'] = '$uper$trong2007!'
-
 class Database:
     def _setup_connection(self):
         self.conn = mysql.connector.connect(host='localhost', user='root', password=os.environ['password'])
