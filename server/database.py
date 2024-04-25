@@ -3,11 +3,14 @@ import hashlib
 import random as rd
 import mysql.connector
 from typing import List, Tuple
+from dotenv import load_dotenv
 
+
+load_dotenv('config.env')
 
 class Database:
     def _setup_connection(self):
-        self.conn = mysql.connector.connect(host='localhost', user='root', password=os.environ['password'])
+        self.conn = mysql.connector.connect(host='localhost', user='root', password=os.environ['DATABASE_PASSWORD'])
         self.cursor = self.conn.cursor()
         
         self.cursor.execute('CREATE DATABASE IF NOT EXISTS fistbump')
