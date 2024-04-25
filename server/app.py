@@ -122,11 +122,8 @@ def get_images():
     try:
         image_rows = Database().get_images()
         image_paths = [image_row[3] for image_row in image_rows]
-        if image_paths:
-            image_paths.reverse()
-            return jsonify({'msg': 'SUCCESS', 'image_paths': image_paths})
-        else:
-            return jsonify({'msg': 'FAILED'})
+        image_paths.reverse()
+        return jsonify({'msg': 'SUCCESS', 'image_paths': image_paths})
     except Exception as e:
         print(e)
         return jsonify({'msg': 'ERROR'}), 500
