@@ -19,7 +19,7 @@ def transfer_files(target_dir: str) -> None:
         sudo_password = os.environ['password']
         
         command_root = f"echo '{sudo_password}' | sudo -S rsync -avz"
-        exclude_info = "--exclude='.git/' --exclude='media/' --exclude='.DS_Store' --exclude='.gitignore' --exclude='__pycache__/' --exclude='rsync_deploy.py' --exclude='tests/'"
+        exclude_info = "--exclude='.git/' --exclude='media/' --exclude='.DS_Store' --exclude='.gitignore' --exclude='__pycache__/' --exclude='rsync_deploy.py' --exclude='tests/' --exclude='config.env'"
         rsync_info = f"-e 'ssh -i {key_path}' {curr_path} ubuntu@{server_address}:~/{target_dir}"
         full_command = ' '.join([command_root, exclude_info, rsync_info])
         

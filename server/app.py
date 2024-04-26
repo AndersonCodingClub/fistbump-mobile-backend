@@ -80,9 +80,8 @@ def get_match():
         user_id = int(request.json['userID'])
         
         match_row = d.get_match_row(user_id)
-        match_day_difference = (date.today() - match_row[-1].date()).days
 
-        if match_row and match_day_difference == 0:
+        if match_row and (date.today() - match_row[-1].date()).days == 0:
             # Return existing match information
             match_user_id = (match_row[1] if match_row[1] != user_id else match_row[2])
             match_user_row = d.get_user_row(match_user_id)
