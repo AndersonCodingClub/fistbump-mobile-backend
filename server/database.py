@@ -150,7 +150,7 @@ class Database:
         self._setup_connection()
         
         if user_id:
-            self.cursor.execute('SELECT * FROM images WHERE user_id=%s', (user_id,))
+            self.cursor.execute('SELECT * FROM images WHERE user_id=%s OR match_user_id=%s', (user_id, user_id))
         else:
             self.cursor.execute('SELECT * FROM images')
         rows = self.cursor.fetchall()
