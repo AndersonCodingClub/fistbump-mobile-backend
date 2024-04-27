@@ -1,6 +1,7 @@
 import os
 import base64
 from datetime import date
+from streak import Streak
 from database import Database
 from dotenv import load_dotenv
 from save import save_image_file
@@ -67,10 +68,19 @@ def get_user_info(user_id):
         user_row = d.get_user_row(user_id)
         post_count = len(d.get_images(user_id))
         follower_count, following_count = len(d.get_followers(user_id)), len(d.get_following(user_id))
-        return jsonify({'msg': 'SUCCESS', 'name': user_row[1], 'username': user_row[2], 'followerCount': follower_count, 'followingCount': following_count, 'postCount': post_count})
+        streak = Streak.handle_streak(user_id, False)
+        return jsonify({'msg': 'SUCCESS', 'name': user_row[1], 'username': user_row[2], 'followerCount': follower_count, 'followingCount': following_count, 'postCount': post_count, 'streak': streak})
     except Exception as e:
         print(e)
         return jsonify({'msg': 'ERROR'}), 500
+    
+@app.route('/get-streak/<user_id>')
+def get_user_streak(user_id):
+    try:
+        return {'streak': Streak.handle_streak(user_id, False)}
+    except Exception as e:
+        print(e)
+        return jsonify({'msg':'ERROR'}), 500
 
 # Matching services
 @app.route('/get-match', methods=['POST'])
@@ -108,6 +118,7 @@ def save_image():
 
         path = save_image_file(decoded_data)
         image_id = Database().add_image(user_id, match_user_id, path)
+        Streak.handle_streak(user_id, True)
         if image_id:
             return jsonify({'msg': 'SUCCESS'})
         else:

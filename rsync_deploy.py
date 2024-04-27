@@ -30,5 +30,5 @@ def transfer_files(target_dir: str) -> None:
         print(e)
         
 if __name__ == '__main__':
-    target_dir = 'fistbump_backend_v1'
+    target_dir = 'fistbump_backend_v2'
     transfer_files(target_dir)

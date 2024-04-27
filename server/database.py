@@ -211,6 +211,34 @@ class Database:
         
         self._close_connection()
         
+    # Streak methods
+    def get_streak(self, user_id: int) -> int:
+        self._setup_connection()
+        
+        self.cursor.execute('SELECT streak FROM users WHERE user_id=%s', (user_id,))
+        row = self.cursor.fetchone()
+        
+        self._close_connection()
+        return row[0]
+    
+    def increment_streak(self, user_id: int) -> int:
+        self._setup_connection()
+        
+        self.cursor.execute('UPDATE users SET streak=streak+1 WHERE user_id=%s', (user_id,))
+        self.conn.commit()
+        
+        self._close_connection()
+        return self.get_streak(user_id)
+    
+    def set_streak(self, user_id: int, value: int) -> int:
+        self._setup_connection()
+        
+        self.cursor.execute('UPDATE users SET streak=%s WHERE user_id=%s', (value, user_id))
+        self.conn.commit()
+        
+        self._close_connection()
+        return value
+        
     # Follow methods
     def add_follower(self, follower_id: int, following_id: int):
         self._setup_connection()
