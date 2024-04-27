@@ -189,6 +189,20 @@ def get_following(user_id):
         print(e)
         return jsonify({'msg': 'ERROR'}), 500
     
+@app.route('/check-following-status', methods=['POST'])
+def check_following_status():
+    try:
+        data = request.json
+        d = Database()
+        
+        viewer_user_id, status_for_user_id = int(data['viewerUserID']), int(data['userID'])
+        follower_user_ids = d.get_followers(status_for_user_id)
+        
+        return jsonify({'msg': 'SUCCESS', 'isFollowing': viewer_user_id in follower_user_ids})
+    except Exception as e:
+        print(e)
+        return jsonify({'msg': 'ERROR'}), 500
+    
 @app.route('/follow', methods=['POST'])
 def follow_user():
     try:
