@@ -148,10 +148,10 @@ def serve_media_metadata(img_path):
     try:
         d = Database()
         image_row = d.get_image_row(img_path)
-        user1_id, user2_id, date_published = image_row[1], image_row[2], image_row[-1]
+        user1_id, user2_id, date_published = image_row[1], image_row[2], image_row[-1].strftime('%Y-%m-%d %I:%M %p')
         user1_username, user2_username = d.get_user_row(user1_id)[2], d.get_user_row(user2_id)[2]
         
-        return jsonify({'msg': 'SUCCESS', 'user1_id': user1_id, 'user2_id': user2_id, 'user1_name': user1_username, 'user2_name': user2_username, 'date_published': str(date_published)})
+        return jsonify({'msg': 'SUCCESS', 'user1_id': user1_id, 'user2_id': user2_id, 'user1_name': user1_username, 'user2_name': user2_username, 'date_published': date_published})
     except Exception as e:
         print(e)
         return jsonify({'msg': 'ERROR'}), 500
