@@ -128,6 +128,7 @@ def save_user_post():
         path = save_post(decoded_data)
         post_id = Database().add_post(user_id, match_user_id, path)
         Streak.handle_streak(user_id, True)
+        Streak.handle_streak(match_user_id, True)
         if post_id:
             return jsonify({'msg': 'SUCCESS'})
         else:
