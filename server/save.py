@@ -23,3 +23,14 @@ def save_post(img_data: bytes) -> str:
         f.write(img_data)
         
     return save_path
+
+def save_profile_picture(img_data: bytes, user_id: int) -> str:
+    if not os.path.exists(PROFILE_PATH):
+        os.makedirs(PROFILE_PATH)
+        
+    save_path = os.path.join(PROFILE_PATH, f'pfp_{user_id}.png')
+    
+    with open(save_path, 'wb') as f:
+        f.write(img_data)
+        
+    return save_path

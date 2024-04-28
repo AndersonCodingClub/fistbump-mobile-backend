@@ -24,7 +24,8 @@ class Database:
                 password VARCHAR(255) NOT NULL,
                 major VARCHAR(255),
                 age INT,
-                streak INT NOT NULL DEFAULT 0
+                streak INT NOT NULL DEFAULT 0,
+                pfp_path VARCHAR(255)
             )
         ''')
         
@@ -124,7 +125,7 @@ class Database:
         self.conn.commit()
         self._close_connection()
 
-    # Image methods
+    # Post methods
     def add_post(self, user_id: int, match_user_id: int, path: str) -> int:
         self._setup_connection()
         
@@ -157,6 +158,28 @@ class Database:
         
         self._close_connection()
         return rows
+    
+    # Profile picture methods
+    def get_profile_picture(self, user_id: int) -> List[Tuple]:
+        self._setup_connection()
+        
+        self.cursor.execute('SELECT pfp_path FROM users WHERE user_id=%s', (user_id,))
+        row = self.cursor.fetchone()
+        
+        self._close_connection()
+        if row is not None:
+            return row[0]
+        else:
+            return ''
+    
+    def set_profile_picture(self, user_id: int, pfp_path: str) -> str:
+        self._setup_connection()
+        
+        self.cursor.execute('UPDATE users SET pfp_path=%s WHERE user_id=%s', (pfp_path, user_id))
+        self.conn.commit()
+        
+        self._close_connection()
+        return pfp_path
     
     # Match methods
     def get_random_match_user(self, user_id: int) -> int:
@@ -199,8 +222,10 @@ class Database:
     
     def set_match_status_to_done(self, user_id: int):
         self._setup_connection()
+        
         self.cursor.execute('UPDATE matches SET status="done" WHERE (user1_id=%s OR user2_id=%s)', (user_id, user_id))
         self.conn.commit()
+        
         self._close_connection()
         
     def remove_match_row(self, user_id: int):

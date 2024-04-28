@@ -5,7 +5,7 @@ from datetime import date
 from streak import Streak
 from database import Database
 from dotenv import load_dotenv
-from save import save_post
+from save import save_post, save_profile_picture
 from flask import Flask, request, jsonify, send_from_directory
 
 
@@ -70,7 +70,15 @@ def get_user_info(user_id):
         post_count = len(d.get_posts(user_id))
         follower_count, following_count = len(d.get_followers(user_id)), len(d.get_following(user_id))
         streak = Streak.handle_streak(user_id, False)
-        return jsonify({'msg': 'SUCCESS', 'name': user_row[1], 'username': user_row[2], 'followerCount': follower_count, 'followingCount': following_count, 'postCount': post_count, 'streak': streak})
+        profile_picture_path = d.get_profile_picture(user_id)
+        return jsonify({'msg': 'SUCCESS', 
+                        'name': user_row[1], 
+                        'username': user_row[2], 
+                        'followerCount': follower_count, 
+                        'followingCount': following_count, 
+                        'postCount': post_count, 
+                        'streak': streak,
+                        'profilePicture': profile_picture_path})
     except Exception as e:
         print(e)
         return jsonify({'msg': 'ERROR'}), 500
@@ -135,6 +143,21 @@ def get_user_posts():
         post_paths = [post_row[3] for post_row in post_rows]
         post_paths.reverse()
         return jsonify({'msg': 'SUCCESS', 'image_paths': post_paths})
+    except Exception as e:
+        print(e)
+        return jsonify({'msg': 'ERROR'}), 500
+    
+@app.route('/save-profile-picture', methods=['POST'])
+def save_user_profile_picture():
+    try:
+        data = request.json
+        
+        user_id, image_data_url = data['userID'], data['imageData']
+        decoded_data = base64.b64decode(image_data_url.encode('utf-8'))
+        
+        path = save_profile_picture(decoded_data, user_id)
+        Database().set_profile_picture(user_id, path)
+        return jsonify({'msg': 'SUCCESS'})
     except Exception as e:
         print(e)
         return jsonify({'msg': 'ERROR'}), 500
