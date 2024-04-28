@@ -5,7 +5,7 @@ from datetime import date
 from streak import Streak
 from database import Database
 from dotenv import load_dotenv
-from save import save_image_file
+from save import save_post
 from flask import Flask, request, jsonify, send_from_directory
 
 
@@ -67,7 +67,7 @@ def get_user_info(user_id):
     try:
         d = Database()
         user_row = d.get_user_row(user_id)
-        post_count = len(d.get_images(user_id))
+        post_count = len(d.get_posts(user_id))
         follower_count, following_count = len(d.get_followers(user_id)), len(d.get_following(user_id))
         streak = Streak.handle_streak(user_id, False)
         return jsonify({'msg': 'SUCCESS', 'name': user_row[1], 'username': user_row[2], 'followerCount': follower_count, 'followingCount': following_count, 'postCount': post_count, 'streak': streak})
@@ -109,18 +109,18 @@ def get_match():
         return jsonify({'msg': 'ERROR'}), 500
 
 # Image services
-@app.route('/save-image', methods=['POST'])
-def save_image():
+@app.route('/save-post', methods=['POST'])
+def save_user_post():
     try:
         data = request.json
         
         user_id, match_user_id, image_data_url = data['userID'], data['matchUserID'], data['imageData']
         decoded_data = base64.b64decode(image_data_url.encode('utf-8'))
 
-        path = save_image_file(decoded_data)
-        image_id = Database().add_image(user_id, match_user_id, path)
+        path = save_post(decoded_data)
+        post_id = Database().add_post(user_id, match_user_id, path)
         Streak.handle_streak(user_id, True)
-        if image_id:
+        if post_id:
             return jsonify({'msg': 'SUCCESS'})
         else:
             return jsonify({'msg': 'FAILED'})
@@ -128,28 +128,31 @@ def save_image():
         print(e)
         return jsonify({'msg': 'ERROR'}), 500
     
-@app.route('/get-images')
-def get_images():
+@app.route('/get-posts')
+def get_user_posts():
     try:
-        image_rows = Database().get_images()
-        image_paths = [image_row[3] for image_row in image_rows]
-        image_paths.reverse()
-        return jsonify({'msg': 'SUCCESS', 'image_paths': image_paths})
+        post_rows = Database().get_posts()
+        post_paths = [post_row[3] for post_row in post_rows]
+        post_paths.reverse()
+        return jsonify({'msg': 'SUCCESS', 'image_paths': post_paths})
     except Exception as e:
         print(e)
         return jsonify({'msg': 'ERROR'}), 500
     
 @app.route('/serve/<path:img_path>')
 def serve_media(img_path):
-    directory, file_name = img_path.split('/')
+    path_components = img_path.split('/')
+    directory = f'{path_components[0]}/{path_components[1]}'
+    file_name = path_components[2]
+    
     return send_from_directory(directory, file_name)
 
 @app.route('/serve/<path:img_path>/metadata')
 def serve_media_metadata(img_path):
     try:
         d = Database()
-        image_row = d.get_image_row(img_path)
-        user1_id, user2_id, date_published = image_row[1], image_row[2], image_row[-1]
+        post_row = d.get_post_row(img_path)
+        user1_id, user2_id, date_published = post_row[1], post_row[2], post_row[-1]
         user1_username, user2_username = d.get_user_row(user1_id)[2], d.get_user_row(user2_id)[2]
         
         if os.environ.get('ON_SERVER', 'True') == 'True':

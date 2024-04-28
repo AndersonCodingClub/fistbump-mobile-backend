@@ -6,7 +6,7 @@ class Streak:
     @staticmethod
     def handle_streak(user_id: int, increment: bool=False) -> int:
         d = Database()
-        rows = d.get_images(user_id)
+        rows = d.get_posts(user_id)
         if len(rows) == 0:
             return 0
         

@@ -51,8 +51,8 @@ class Database:
         ''')
         
         self.cursor.execute('''
-            CREATE TABLE IF NOT EXISTS images (
-                image_id INT AUTO_INCREMENT PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS posts (
+                post_id INT AUTO_INCREMENT PRIMARY KEY,
                 user_id INT NOT NULL,
                 match_user_id INT NOT NULL,
                 path VARCHAR(255) NOT NULL,
@@ -125,34 +125,34 @@ class Database:
         self._close_connection()
 
     # Image methods
-    def add_image(self, user_id: int, match_user_id: int, path: str) -> int:
+    def add_post(self, user_id: int, match_user_id: int, path: str) -> int:
         self._setup_connection()
         
-        insert_query = 'INSERT INTO images (user_id, match_user_id, path, date_published) VALUES (%s, %s, %s, CURRENT_TIMESTAMP)'
+        insert_query = 'INSERT INTO posts (user_id, match_user_id, path, date_published) VALUES (%s, %s, %s, CURRENT_TIMESTAMP)'
         row = (user_id, match_user_id, path)
         self.cursor.execute(insert_query, row)
         self.conn.commit()
-        image_id = self.cursor.lastrowid
+        post_id = self.cursor.lastrowid
         
         self._close_connection()
-        return image_id
+        return post_id
     
-    def get_image_row(self, path: str) -> List[Tuple]:
+    def get_post_row(self, path: str) -> List[Tuple]:
         self._setup_connection()
         
-        self.cursor.execute('SELECT * FROM images WHERE path=%s', (path,))
+        self.cursor.execute('SELECT * FROM posts WHERE path=%s', (path,))
         row = self.cursor.fetchone()
         
         self._close_connection()
         return row
     
-    def get_images(self, user_id: int=None) -> List[Tuple]:
+    def get_posts(self, user_id: int=None) -> List[Tuple]:
         self._setup_connection()
         
         if user_id:
-            self.cursor.execute('SELECT * FROM images WHERE user_id=%s OR match_user_id=%s', (user_id, user_id))
+            self.cursor.execute('SELECT * FROM posts WHERE user_id=%s OR match_user_id=%s', (user_id, user_id))
         else:
-            self.cursor.execute('SELECT * FROM images')
+            self.cursor.execute('SELECT * FROM posts')
         rows = self.cursor.fetchall()
         
         self._close_connection()
