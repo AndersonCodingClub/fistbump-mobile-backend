@@ -1,11 +1,10 @@
 import os
-import pytz
 import base64
-from datetime import date
 from streak import Streak
 from database import Database
 from dotenv import load_dotenv
 from save import save_post, save_profile_picture
+from utils import conditional_convert, get_today_date
 from flask import Flask, request, jsonify, send_from_directory
 
 
@@ -99,8 +98,9 @@ def get_match():
         user_id = int(request.json['userID'])
         
         match_row = d.get_match_row(user_id)
+        match_row_date = conditional_convert(match_row[-1].date())
 
-        if match_row and (date.today() - match_row[-1].date()).days == 0:
+        if match_row and (get_today_date() - match_row_date).days == 0:
             # Return existing match information
             match_user_id = (match_row[1] if match_row[1] != user_id else match_row[2])
             match_user_row = d.get_user_row(match_user_id)
@@ -179,14 +179,7 @@ def serve_media_metadata(img_path):
         user1_id, user2_id, date_published = post_row[1], post_row[2], post_row[-1]
         user1_username, user2_username = d.get_user_row(user1_id)[2], d.get_user_row(user2_id)[2]
         
-        if os.environ.get('ON_SERVER', 'True') == 'True':
-            utc_zone = pytz.utc
-            cst_zone = pytz.timezone('America/Chicago')
-            date_published_utc = utc_zone.localize(date_published)
-            date_published_cst = date_published_utc.astimezone(cst_zone)
-        else:
-            date_published_cst = date_published
-        
+        date_published_cst = conditional_convert(date_published)
         formatted_date = date_published_cst.strftime('%Y-%m-%d %I:%M %p')
         
         return jsonify({'msg': 'SUCCESS', 'user1_id': user1_id, 'user2_id': user2_id, 'user1_name': user1_username, 'user2_name': user2_username, 'date_published': formatted_date})

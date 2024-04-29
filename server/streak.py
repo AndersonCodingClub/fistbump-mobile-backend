@@ -1,6 +1,5 @@
-from datetime import date
 from database import Database
-
+from utils import conditional_convert, get_today_date
 
 class Streak:
     @staticmethod
@@ -11,8 +10,8 @@ class Streak:
             return 0
         
         most_recent_image_row = rows[-1]
-        last_picture_date = most_recent_image_row[-1].date()
-        current_date = date.today()
+        last_picture_date = conditional_convert(most_recent_image_row[-1].date())
+        current_date = get_today_date()
         day_difference = (current_date - last_picture_date).days
         
         if day_difference >= 2:
