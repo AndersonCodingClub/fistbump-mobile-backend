@@ -10,7 +10,7 @@ class Streak:
             return 0
         
         most_recent_image_row = rows[-1]
-        last_picture_date = conditional_convert(most_recent_image_row[-1].date())
+        last_picture_date = conditional_convert(most_recent_image_row[-1])
         current_date = get_today_date()
         day_difference = (current_date - last_picture_date).days
         

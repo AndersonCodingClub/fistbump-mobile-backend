@@ -98,7 +98,7 @@ def get_match():
         user_id = int(request.json['userID'])
         
         match_row = d.get_match_row(user_id)
-        match_row_date = conditional_convert(match_row[-1].date())
+        match_row_date = conditional_convert(match_row[-1])
 
         if match_row and (get_today_date() - match_row_date).days == 0:
             # Return existing match information

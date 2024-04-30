@@ -17,4 +17,4 @@ def conditional_convert(date):
     return date
 
 def get_today_date():
-    return conditional_convert(dt.date.today())
+    return conditional_convert(dt.datetime.now())
